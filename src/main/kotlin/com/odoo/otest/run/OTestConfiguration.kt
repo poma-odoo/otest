@@ -16,7 +16,7 @@ class OTestConfiguration(
 ) : RunConfigurationBase<OTestConfiguration>(project, factory, name) {
 
     var databaseName: String = ""
-    var modules: String = ""
+    var testModules: String = ""
     var testClasses: String = ""
     var testMethods: String = ""
     var testTags: String = ""
@@ -48,53 +48,17 @@ class OTestConfiguration(
 
     @NlsSafe
     fun compileTestTags(): String {
-        val testTagsLocal = testTags.ifEmpty { "," }
-        var res = modules.split(",").flatMap { module ->
-            testTagsLocal.split(",").map { testTag -> "$testTag/$module" }
-        }.joinToString(",")
-        testClasses.split(",").forEach { testClass ->
-            testTagsLocal.split(",").forEach { testTag ->
-                res += "$testTag:$testClass,"
-            }
+        fun normalizeTags(input: String, startChar: Char): String {
+            return input.replace("\\s".toRegex(), ",")
+                .split(",")
+                .filter { it.isNotEmpty() }
+                .joinToString(separator = ",") { if (it.first().isLetter()) "$startChar$it" else it }
         }
-        testMethods.split(",").forEach { testMethod ->
-            testTagsLocal.split(",").forEach { testTag ->
-                res += "$testTag.$testMethod,"
-            }
-        }
-        res = res.removeSuffix(",")
-        return res
+        return listOfNotNull(
+            testTags.takeIf { it.isNotEmpty() },
+            normalizeTags(testModules, '/'),
+            normalizeTags(testClasses, ':'),
+            normalizeTags(testMethods, '.'),
+        ).joinToString(separator = ",")
     }
-
-    /*
-        @NlsSafe
-        fun getDatabaseName(): String {
-            return databaseName
-        }
-
-        @NlsSafe
-        fun getModules(): String {
-            return modules
-        }
-
-        @NlsSafe
-        fun getTestClasses(): String {
-            return testClasses
-        }
-
-        @NlsSafe
-        fun getTestMethods(): String {
-            return testMethods
-        }
-
-        @NlsSafe
-        fun getTestTags(): String {
-            return testTags
-        }
-
-        @NlsSafe
-        fun getOdooBinPath(): String {
-            return odooBinPath
-        }
-    */
 }

@@ -37,32 +37,12 @@ class OTestConfigurationEditor (private val compiledTestTagsUpdater: () -> Unit)
             project, // Pass the project here
             fileChooserDescriptor
         )
-/*        testModulesField.document.addDocumentListener(object : DocumentListener {
-            override fun insertUpdate(e: DocumentEvent?) { compiledTestTagsUpdater() }
-            override fun removeUpdate(e: DocumentEvent?) { compiledTestTagsUpdater() }
-            override fun changedUpdate(e: DocumentEvent?) { compiledTestTagsUpdater() }
-        })
-        testClassesField.document.addDocumentListener(object : DocumentListener {
-            override fun insertUpdate(e: DocumentEvent?) { compiledTestTagsUpdater() }
-            override fun removeUpdate(e: DocumentEvent?) { compiledTestTagsUpdater() }
-            override fun changedUpdate(e: DocumentEvent?) { compiledTestTagsUpdater() }
-        })
-        testMethodsField.document.addDocumentListener(object : DocumentListener {
-            override fun insertUpdate(e: DocumentEvent?) { compiledTestTagsUpdater() }
-            override fun removeUpdate(e: DocumentEvent?) { compiledTestTagsUpdater() }
-            override fun changedUpdate(e: DocumentEvent?) { compiledTestTagsUpdater() }
-        })
-        testTagsField.document.addDocumentListener(object : DocumentListener {
-            override fun insertUpdate(e: DocumentEvent?) { compiledTestTagsUpdater() }
-            override fun removeUpdate(e: DocumentEvent?) { compiledTestTagsUpdater() }
-            override fun changedUpdate(e: DocumentEvent?) { compiledTestTagsUpdater() }
-        })*/
     }
 
     override fun resetEditorFrom(configuration: OTestConfiguration) {
         currentConfiguration = configuration
         databaseNameField.text = configuration.databaseName
-        testModulesField.text = configuration.modules
+        testModulesField.text = configuration.testModules
         testClassesField.text = configuration.testClasses
         testMethodsField.text = configuration.testMethods
         testTagsField.text = configuration.testTags
@@ -82,7 +62,7 @@ class OTestConfigurationEditor (private val compiledTestTagsUpdater: () -> Unit)
 
     override fun applyEditorTo(configuration: OTestConfiguration) {
         configuration.databaseName = databaseNameField.text
-        configuration.modules = testModulesField.text
+        configuration.testModules = testModulesField.text
         configuration.testClasses = testClassesField.text
         configuration.testMethods = testMethodsField.text
         configuration.testTags = testTagsField.text
@@ -94,10 +74,10 @@ class OTestConfigurationEditor (private val compiledTestTagsUpdater: () -> Unit)
     override fun createEditor(): JComponent {
         return FormBuilder.createFormBuilder()
             .addLabeledComponent(JBLabel(OTestBundle.message("run.configuration.otest.database")), databaseNameField)
-            .addLabeledComponent(JBLabel(OTestBundle.message("run.configuration.otest.modules")), testModulesField)
-            .addLabeledComponent(JBLabel(OTestBundle.message("run.configuration.otest.testClasses")), testClassesField)
-            .addLabeledComponent(JBLabel(OTestBundle.message("run.configuration.otest.testMethods")), testMethodsField)
-            .addLabeledComponent(JBLabel(OTestBundle.message("run.configuration.otest.testTags")), testTagsField)
+            .addLabeledComponent(JBLabel(OTestBundle.message("run.configuration.otest.testModules")).apply { toolTipText = OTestBundle.message("run.configuration.otest.testModules.tooltip")}, testModulesField)
+            .addLabeledComponent(JBLabel(OTestBundle.message("run.configuration.otest.testClasses")).apply { toolTipText = OTestBundle.message("run.configuration.otest.testClasses.tooltip")}, testClassesField)
+            .addLabeledComponent(JBLabel(OTestBundle.message("run.configuration.otest.testMethods")).apply { toolTipText = OTestBundle.message("run.configuration.otest.testMethods.tooltip")}, testMethodsField)
+            .addLabeledComponent(JBLabel(OTestBundle.message("run.configuration.otest.testTags")).apply { toolTipText = OTestBundle.message("run.configuration.otest.testTags.tooltip")}, testTagsField)
             .addLabeledComponent(JBLabel(OTestBundle.message("run.configuration.otest.odooBinPath")), odooBinPathField)
             .addLabeledComponent(JBLabel(OTestBundle.message("run.configuration.otest.compiledTestTags")), compiledTestTagsField)
             .panel
@@ -106,7 +86,7 @@ class OTestConfigurationEditor (private val compiledTestTagsUpdater: () -> Unit)
     private fun updateCompiledTestTagsPreview() {
         currentConfiguration?.let { configuration ->
             configuration.databaseName = databaseNameField.text
-            configuration.modules = testModulesField.text
+            configuration.testModules = testModulesField.text
             configuration.testClasses = testClassesField.text
             configuration.testMethods = testMethodsField.text
             configuration.testTags = testTagsField.text
