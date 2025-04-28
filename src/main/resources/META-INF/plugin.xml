@@ -1,15 +1,18 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.pomaodoo.otest</id>
+    <id>com.odoo.otest</id>
     <name>otest</name>
     <vendor>poma-odoo</vendor>
 
-    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.python</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
+    <resource-bundle>messages.OTest</resource-bundle>
 
+<!--    <extensions defaultExtensionNs="com.intellij.">
+        <toolWindow factoryClass="com.odoo.otest.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <postStartupActivity implementation="com.odoo.otest.startup.MyProjectActivity" />
+    </extensions>-->
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.pomaodoo.otest.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.pomaodoo.otest.startup.MyProjectActivity" />
+        <configurationType implementation="com.odoo.otest.run.OTestConfigurationType"/>
     </extensions>
 </idea-plugin>
