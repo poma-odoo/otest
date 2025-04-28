@@ -5,6 +5,7 @@ import com.intellij.execution.configurations.*
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.NlsSafe
 import com.intellij.util.xmlb.XmlSerializer
 import org.jdom.Element
 
@@ -20,12 +21,14 @@ class OTestConfiguration(
     var testMethods: String = ""
     var testTags: String = ""
     var odooBinPath: String = ""
+    var compiledTestTags: String = ""
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> {
-        return OTestConfigurationEditor()
+        return OTestConfigurationEditor(this::updateCompiledTestTags)
     }
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState? {
+        updateCompiledTestTags()
         return OTestRunState(environment, this)
     }
 
@@ -39,35 +42,59 @@ class OTestConfiguration(
         XmlSerializer.serializeInto(this, element)
     }
 
-/*
-    @NlsSafe
-    fun getDatabaseName(): String {
-        return databaseName
+    fun updateCompiledTestTags() {
+        compiledTestTags = compileTestTags()
     }
 
     @NlsSafe
-    fun getModules(): String {
-        return modules
+    fun compileTestTags(): String {
+        val testTagsLocal = testTags.ifEmpty { "," }
+        var res = modules.split(",").flatMap { module ->
+            testTagsLocal.split(",").map { testTag -> "$testTag/$module" }
+        }.joinToString(",")
+        testClasses.split(",").forEach { testClass ->
+            testTagsLocal.split(",").forEach { testTag ->
+                res += "$testTag:$testClass,"
+            }
+        }
+        testMethods.split(",").forEach { testMethod ->
+            testTagsLocal.split(",").forEach { testTag ->
+                res += "$testTag.$testMethod,"
+            }
+        }
+        res = res.removeSuffix(",")
+        return res
     }
 
-    @NlsSafe
-    fun getTestClasses(): String {
-        return testClasses
-    }
+    /*
+        @NlsSafe
+        fun getDatabaseName(): String {
+            return databaseName
+        }
 
-    @NlsSafe
-    fun getTestMethods(): String {
-        return testMethods
-    }
+        @NlsSafe
+        fun getModules(): String {
+            return modules
+        }
 
-    @NlsSafe
-    fun getTestTags(): String {
-        return testTags
-    }
+        @NlsSafe
+        fun getTestClasses(): String {
+            return testClasses
+        }
 
-    @NlsSafe
-    fun getOdooBinPath(): String {
-        return odooBinPath
-    }
-*/
+        @NlsSafe
+        fun getTestMethods(): String {
+            return testMethods
+        }
+
+        @NlsSafe
+        fun getTestTags(): String {
+            return testTags
+        }
+
+        @NlsSafe
+        fun getOdooBinPath(): String {
+            return odooBinPath
+        }
+    */
 }

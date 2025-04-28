@@ -15,15 +15,19 @@ import com.intellij.openapi.util.Key
 import org.jetbrains.annotations.NotNull
 import java.nio.charset.Charset
 
-class OTestRunState(environment: ExecutionEnvironment, private val configuration: OTestConfiguration) : CommandLineState(environment) {
+class OTestRunState(environment: ExecutionEnvironment, private val configuration: OTestConfiguration) :
+    CommandLineState(environment) {
     private var consoleView: ConsoleView? = null
 
     override fun startProcess(): OSProcessHandler {
-        var commandLine = GeneralCommandLine("${configuration.odooBinPath}")
+        val commandLine = GeneralCommandLine(configuration.odooBinPath)
+            .withCharset(Charset.forName("UTF-8"))
+            .withWorkDirectory(environment.project.basePath)
+//        todo: add odoo addons folder finder
+
         commandLine.addParameter("--test-enable")
-        commandLine.addParameter("--test-tags=${configuration.testTags}")
+        commandLine.addParameter("--test-tags=${configuration.compiledTestTags}")
         commandLine.addParameter("--database=${configuration.databaseName}")
-        commandLine.charset = Charset.forName("UTF-8")
 
 
         val handler = OSProcessHandler(commandLine)
@@ -49,7 +53,10 @@ class OTestRunState(environment: ExecutionEnvironment, private val configuration
                     com.intellij.execution.ui.ConsoleViewContentType.ERROR_OUTPUT
                 }
                 consoleView?.print("\nOTest: ", com.intellij.execution.ui.ConsoleViewContentType.NORMAL_OUTPUT)
-                consoleView?.print(if (testsPassed && event.exitCode == 0) "PASSED\n" else "FAILED (exit code: ${event.exitCode})\n", resultContentType)
+                consoleView?.print(
+                    if (testsPassed && event.exitCode == 0) "PASSED\n" else "FAILED (exit code: ${event.exitCode})\n",
+                    resultContentType
+                )
             }
         })
 
@@ -64,7 +71,5 @@ class OTestRunState(environment: ExecutionEnvironment, private val configuration
         }
         return consoleView!!
     }
-
-
 
 }
